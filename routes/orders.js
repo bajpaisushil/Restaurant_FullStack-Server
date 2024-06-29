@@ -21,16 +21,28 @@ router.post("/", isUser, async (req, res) => {
 
 router.get("/", isAdmin, async (req, res) => {
   const query = req.query.new;
+  console.log('querynew-', req.query);
   try {
-    const orders = query
-      ? await Order.find().sort({ _id: -1 }).limit(4)
-      : await Order.find().sort({ _id: -1 });
+    const orders = await Order.find().sort({ _id: -1 });
     res.status(200).send(orders);
   } catch (error) {
     console.log(error);
     res.status(500).send(error);
   }
 });
+
+router.get("/user/:userId", async (req, res) => {
+  const userId=req.params.userId;
+  try {
+    const orders = await Order.find({customerId: userId}).sort({ _id: -1 });
+    console.log('orders-', orders);
+    res.status(200).send(orders);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send(error);
+  }
+});
+
 router.put("/:id", isAdmin, async (req, res) => {
   try {
     const updatedOrder = await Order.findByIdAndUpdate(
@@ -44,7 +56,7 @@ router.put("/:id", isAdmin, async (req, res) => {
   }
 });
 
-router.get("/findOne/:id", isAdmin, async (req, res) => {
+router.get("/findOne/:id", async (req, res) => {
   try {
     const order = await Order.findById(req.params.id).populate(
       "customerId",
